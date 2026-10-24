@@ -9,50 +9,422 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppRouteImport } from './routes/_app'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as RegisterRouteImport } from './routes/register'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AppIndexRouteImport } from './routes/_app.index'
+import { Route as AppAgentsRouteImport } from './routes/_app.agents'
+import { Route as AppAuditRouteImport } from './routes/_app.audit'
+import { Route as AppDevicesRouteImport } from './routes/_app.devices'
+import { Route as AppEntitlementsRouteImport } from './routes/_app.entitlements'
+import { Route as AppPlansRouteImport } from './routes/_app.plans'
+import { Route as AppProviderKeysRouteImport } from './routes/_app.provider-keys'
+import { Route as AppRemoteRouteImport } from './routes/_app.remote'
+import { Route as AppSkillsRouteImport } from './routes/_app.skills'
+import { Route as AppSubscriptionsRouteImport } from './routes/_app.subscriptions'
+import { Route as AppUsersRouteImport } from './routes/_app.users'
+import { Route as AppUsersIndexRouteImport } from './routes/_app.users.index'
+import { Route as AppUsersIdRouteImport } from './routes/_app.users.$id'
 
-const IndexRoute = IndexRouteImport.update({
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RegisterRoute = RegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAgentsRoute = AppAgentsRouteImport.update({
+  id: '/agents',
+  path: '/agents',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAuditRoute = AppAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDevicesRoute = AppDevicesRouteImport.update({
+  id: '/devices',
+  path: '/devices',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppEntitlementsRoute = AppEntitlementsRouteImport.update({
+  id: '/entitlements',
+  path: '/entitlements',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPlansRoute = AppPlansRouteImport.update({
+  id: '/plans',
+  path: '/plans',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppProviderKeysRoute = AppProviderKeysRouteImport.update({
+  id: '/provider-keys',
+  path: '/provider-keys',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppRemoteRoute = AppRemoteRouteImport.update({
+  id: '/remote',
+  path: '/remote',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSkillsRoute = AppSkillsRouteImport.update({
+  id: '/skills',
+  path: '/skills',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSubscriptionsRoute = AppSubscriptionsRouteImport.update({
+  id: '/subscriptions',
+  path: '/subscriptions',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppUsersRoute = AppUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppUsersIndexRoute = AppUsersIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppUsersRoute,
+} as any)
+const AppUsersIdRoute = AppUsersIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppUsersRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
+  '/': typeof AppIndexRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/agents': typeof AppAgentsRoute
+  '/audit': typeof AppAuditRoute
+  '/devices': typeof AppDevicesRoute
+  '/entitlements': typeof AppEntitlementsRoute
+  '/plans': typeof AppPlansRoute
+  '/provider-keys': typeof AppProviderKeysRoute
+  '/remote': typeof AppRemoteRoute
+  '/skills': typeof AppSkillsRoute
+  '/subscriptions': typeof AppSubscriptionsRoute
+  '/users': typeof AppUsersRouteWithChildren
+  '/users/$id': typeof AppUsersIdRoute
+  '/users/': typeof AppUsersIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/agents': typeof AppAgentsRoute
+  '/audit': typeof AppAuditRoute
+  '/devices': typeof AppDevicesRoute
+  '/entitlements': typeof AppEntitlementsRoute
+  '/plans': typeof AppPlansRoute
+  '/provider-keys': typeof AppProviderKeysRoute
+  '/remote': typeof AppRemoteRoute
+  '/skills': typeof AppSkillsRoute
+  '/subscriptions': typeof AppSubscriptionsRoute
+  '/': typeof AppIndexRoute
+  '/users/$id': typeof AppUsersIdRoute
+  '/users': typeof AppUsersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/login': typeof LoginRoute
+  '/register': typeof RegisterRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/_app/agents': typeof AppAgentsRoute
+  '/_app/audit': typeof AppAuditRoute
+  '/_app/devices': typeof AppDevicesRoute
+  '/_app/entitlements': typeof AppEntitlementsRoute
+  '/_app/plans': typeof AppPlansRoute
+  '/_app/provider-keys': typeof AppProviderKeysRoute
+  '/_app/remote': typeof AppRemoteRoute
+  '/_app/skills': typeof AppSkillsRoute
+  '/_app/subscriptions': typeof AppSubscriptionsRoute
+  '/_app/users': typeof AppUsersRouteWithChildren
+  '/_app/': typeof AppIndexRoute
+  '/_app/users/$id': typeof AppUsersIdRoute
+  '/_app/users/': typeof AppUsersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/forgot-password'
+    | '/login'
+    | '/register'
+    | '/reset-password'
+    | '/agents'
+    | '/audit'
+    | '/devices'
+    | '/entitlements'
+    | '/plans'
+    | '/provider-keys'
+    | '/remote'
+    | '/skills'
+    | '/subscriptions'
+    | '/users'
+    | '/users/$id'
+    | '/users/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/forgot-password'
+    | '/login'
+    | '/register'
+    | '/reset-password'
+    | '/agents'
+    | '/audit'
+    | '/devices'
+    | '/entitlements'
+    | '/plans'
+    | '/provider-keys'
+    | '/remote'
+    | '/skills'
+    | '/subscriptions'
+    | '/'
+    | '/users/$id'
+    | '/users'
+  id:
+    | '__root__'
+    | '/_app'
+    | '/forgot-password'
+    | '/login'
+    | '/register'
+    | '/reset-password'
+    | '/_app/agents'
+    | '/_app/audit'
+    | '/_app/devices'
+    | '/_app/entitlements'
+    | '/_app/plans'
+    | '/_app/provider-keys'
+    | '/_app/remote'
+    | '/_app/skills'
+    | '/_app/subscriptions'
+    | '/_app/users'
+    | '/_app/'
+    | '/_app/users/$id'
+    | '/_app/users/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
+  LoginRoute: typeof LoginRoute
+  RegisterRoute: typeof RegisterRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/register': {
+      id: '/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof RegisterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/': {
+      id: '/_app/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/agents': {
+      id: '/_app/agents'
+      path: '/agents'
+      fullPath: '/agents'
+      preLoaderRoute: typeof AppAgentsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/audit': {
+      id: '/_app/audit'
+      path: '/audit'
+      fullPath: '/audit'
+      preLoaderRoute: typeof AppAuditRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/devices': {
+      id: '/_app/devices'
+      path: '/devices'
+      fullPath: '/devices'
+      preLoaderRoute: typeof AppDevicesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/entitlements': {
+      id: '/_app/entitlements'
+      path: '/entitlements'
+      fullPath: '/entitlements'
+      preLoaderRoute: typeof AppEntitlementsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/plans': {
+      id: '/_app/plans'
+      path: '/plans'
+      fullPath: '/plans'
+      preLoaderRoute: typeof AppPlansRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/provider-keys': {
+      id: '/_app/provider-keys'
+      path: '/provider-keys'
+      fullPath: '/provider-keys'
+      preLoaderRoute: typeof AppProviderKeysRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/remote': {
+      id: '/_app/remote'
+      path: '/remote'
+      fullPath: '/remote'
+      preLoaderRoute: typeof AppRemoteRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/skills': {
+      id: '/_app/skills'
+      path: '/skills'
+      fullPath: '/skills'
+      preLoaderRoute: typeof AppSkillsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/subscriptions': {
+      id: '/_app/subscriptions'
+      path: '/subscriptions'
+      fullPath: '/subscriptions'
+      preLoaderRoute: typeof AppSubscriptionsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/users': {
+      id: '/_app/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof AppUsersRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/users/': {
+      id: '/_app/users/'
+      path: '/'
+      fullPath: '/users/'
+      preLoaderRoute: typeof AppUsersIndexRouteImport
+      parentRoute: typeof AppUsersRoute
+    }
+    '/_app/users/$id': {
+      id: '/_app/users/$id'
+      path: '/$id'
+      fullPath: '/users/$id'
+      preLoaderRoute: typeof AppUsersIdRouteImport
+      parentRoute: typeof AppUsersRoute
     }
   }
 }
 
+interface AppUsersRouteChildren {
+  AppUsersIdRoute: typeof AppUsersIdRoute
+  AppUsersIndexRoute: typeof AppUsersIndexRoute
+}
+
+const AppUsersRouteChildren: AppUsersRouteChildren = {
+  AppUsersIdRoute: AppUsersIdRoute,
+  AppUsersIndexRoute: AppUsersIndexRoute,
+}
+
+const AppUsersRouteWithChildren = AppUsersRoute._addFileChildren(
+  AppUsersRouteChildren,
+)
+
+interface AppRouteChildren {
+  AppAgentsRoute: typeof AppAgentsRoute
+  AppAuditRoute: typeof AppAuditRoute
+  AppDevicesRoute: typeof AppDevicesRoute
+  AppEntitlementsRoute: typeof AppEntitlementsRoute
+  AppPlansRoute: typeof AppPlansRoute
+  AppProviderKeysRoute: typeof AppProviderKeysRoute
+  AppRemoteRoute: typeof AppRemoteRoute
+  AppSkillsRoute: typeof AppSkillsRoute
+  AppSubscriptionsRoute: typeof AppSubscriptionsRoute
+  AppUsersRoute: typeof AppUsersRouteWithChildren
+  AppIndexRoute: typeof AppIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppAgentsRoute: AppAgentsRoute,
+  AppAuditRoute: AppAuditRoute,
+  AppDevicesRoute: AppDevicesRoute,
+  AppEntitlementsRoute: AppEntitlementsRoute,
+  AppPlansRoute: AppPlansRoute,
+  AppProviderKeysRoute: AppProviderKeysRoute,
+  AppRemoteRoute: AppRemoteRoute,
+  AppSkillsRoute: AppSkillsRoute,
+  AppSubscriptionsRoute: AppSubscriptionsRoute,
+  AppUsersRoute: AppUsersRouteWithChildren,
+  AppIndexRoute: AppIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
+  ForgotPasswordRoute: ForgotPasswordRoute,
+  LoginRoute: LoginRoute,
+  RegisterRoute: RegisterRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
