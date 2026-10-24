@@ -1,0 +1,132 @@
+Crie um sistema chamado HASi Control Plane para administrar o aplicativo HASi Android e, futuramente, as sessões remotas do OpenCode.
+
+Não use Supabase, Firebase ou banco gerenciado. Use PostgreSQL instalado localmente no servidor, preferencialmente via Docker Compose. O PostgreSQL não pode ficar exposto à internet; somente a API do HASi poderá acessá-lo.
+
+Crie um frontend administrativo responsivo e uma API própria.
+
+Stack sugerida:
+Frontend web: React ou Next.js.
+Backend: Node.js com TypeScript.
+Banco: PostgreSQL.
+Migrations versionadas.
+Docker Compose para API, PostgreSQL e serviços auxiliares.
+Nginx ou Caddy como proxy HTTPS.
+A API deve cuidar de:
+cadastro e login;
+recuperação de senha;
+sessões;
+papéis de usuário e administrador;
+dispositivos conectados;
+assinaturas mensais;
+permissões do plano;
+skills;
+agentes;
+preferências;
+chaves BYOK;
+auditoria;
+uso remoto futuro.
+Use Argon2id para senhas. Use access tokens curtos e refresh tokens persistentes armazenados somente como hash no banco. Nunca salve senhas, tokens ou chaves em texto puro.
+
+Crie estas tabelas:
+users
+user_profiles
+admin_roles
+plans
+subscriptions
+subscription_events
+plan_entitlements
+user_devices
+user_sessions
+user_provider_keys
+user_skills
+user_agents
+usage_events
+remote_sessions
+remote_calls
+token_usage
+audit_logs
+A assinatura deve ter os estados:
+trial
+active
+past_due
+canceled
+suspended
+O modelo comercial não usa pacotes de créditos para o agente de celular. A mensalidade do HASi libera o acesso ao aplicativo e aos recursos do plano. Os modelos gratuitos do OpenCode continuam sendo controlados pelo próprio OpenCode, sem alteração, cobrança artificial ou remoção no APK.
+
+Os recursos dos planos devem incluir:
+mobile_assistant
+local_opencode
+custom_skills
+custom_agents
+remote_coding
+remote_session_limit
+monthly_remote_calls
+monthly_remote_tokens
+Não criar carteira de créditos ou recargas nesta primeira versão.
+
+O usuário poderá cadastrar uma chave própria de provedor de IA para modelos premium. A interface nunca deve mostrar a chave completa. A chave deve ser criptografada no backend e nunca retornar ao frontend depois de salva.
+
+Crie as telas:
+Login
+Cadastro
+Recuperação de senha
+Dashboard administrativo
+Lista de usuários
+Detalhes do usuário
+Planos
+Assinaturas
+Entitlements
+Provedores e chaves BYOK
+Skills do usuário
+Agentes do usuário
+Dispositivos conectados
+Uso remoto
+Auditoria
+O administrador deve conseguir:
+criar, suspender e reativar usuários;
+definir ou alterar o plano;
+alterar permissões;
+revogar dispositivos;
+visualizar uso;
+visualizar sessões remotas;
+nunca visualizar chaves completas dos usuários.
+Todos os endpoints protegidos devem validar o usuário autenticado. Um usuário só pode acessar seus próprios dados. Apenas administradores podem acessar o painel global.
+
+Criar endpoints:
+POST /auth/register
+POST /auth/login
+POST /auth/refresh
+POST /auth/logout
+POST /auth/forgot-password
+GET /me
+GET /me/entitlements
+GET /me/devices
+POST /me/devices
+DELETE /me/devices/:id
+GET /me/skills
+GET /me/agents
+GET /me/provider-keys
+POST /me/provider-keys
+DELETE /me/provider-keys/:id
+GET /me/usage
+GET /me/remote-sessions
+Criar migrations, validações, tratamento de erros, logs de auditoria e testes de isolamento entre usuários.
+
+Registrar usage_events, remote_calls e token_usage desde o início, mas não cobrar tokens agora. Esses registros serão usados futuramente para limitar ou cobrar programação remota.
+
+Não implementar ainda o worker remoto do OpenCode. Criar somente uma interface RemoteExecutionProvider, sem mocks fingindo execução real e sem dados fictícios apresentados como reais.
+
+Não alterar o fluxo gratuito/local do HASi Android. O APK deve continuar usando o OpenCode local exatamente como atualmente. A integração com o servidor será uma funcionalidade separada e opcional.
+
+Configurar:
+variáveis de ambiente documentadas;
+secrets fora do código;
+backup automático do PostgreSQL;
+restauração documentada;
+firewall;
+HTTPS;
+migrations de produção;
+health check;
+logs;
+monitoramento básico.
+Entregar o esqueleto conectado ao PostgreSQL real, sem Supabase, sem Firebase, sem placeholders e sem dados fictícios.
