@@ -1,290 +1,111 @@
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance, FastifyRequest } from "fastify";
 import { z } from "zod";
 import { audit } from "../audit.js";
-import { requireAuth, signAccessToken } from "../auth.js";
+import { signAccessToken } from "../auth.js";
 import { config } from "../config.js";
 import { hashPassword, newToken, sha256, verifyPassword } from "../crypto.js";
-import { pool, query, tx } from "../db.js";
+import { query, tx } from "../db.js";
 import { HttpError } from "../errors.js";
 import { sendMail } from "../mailer.js";
 
-const passwordSchema = z.string().min(12, "password must be at least 12 chars").max(200);
-const emailSchema = z.string().trim().toLowerCase().email().max(254);
+const email = z.string().trim().toLowerCase().email().max(254);
+const password = z.string().min(10).max(256);
+const refreshBody = z.object({ refresh_token: z.string().min(20).max(200) });
 
-const sessionSchema = z.object({
-  name: z.string().trim().min(1).max(80),
-  platform: z.string().trim().min(1).max(40),
-  appVersion: z.string().trim().max(40).optional(),
-});
-
-type TokenPair = { accessToken: string; refreshToken: string; expiresIn: number };
-
-async function createSession(
-  userId: string,
-  deviceId: string | null,
-  userAgent: string | undefined,
-  ip: string | undefined,
-): Promise<TokenPair> {
-  const refreshToken = newToken();
-  const sessionId = await tx(async (c) => {
-    const r = await c.query(
-      `INSERT INTO user_sessions (user_id, device_id, refresh_token_hash, user_agent, ip, expires_at)
-       VALUES ($1,$2,$3,$4,$5, now() + ($6 || ' days')::interval) RETURNING id`,
-      [
-        userId,
-        deviceId,
-        sha256(refreshToken),
-        userAgent ?? null,
-        ip ?? null,
-        String(config.REFRESH_TOKEN_TTL_DAYS),
-      ],
-    );
-    return r.rows[0].id as string;
-  });
-  const accessToken = await signAccessToken(userId, sessionId);
-  return { accessToken, refreshToken, expiresIn: config.ACCESS_TOKEN_TTL_SECONDS };
-}
-
-async function userPayload(userId: string) {
-  const r = await query(
-    `SELECT u.id, u.email, u.status, u.created_at,
-            p.display_name, p.locale, p.preferences,
-            EXISTS (SELECT 1 FROM admin_roles a WHERE a.user_id = u.id AND a.role = 'admin') AS is_admin,
-            EXISTS (SELECT 1 FROM admin_roles a WHERE a.user_id = u.id AND a.role = 'support') AS is_support,
-            COALESCE((SELECT json_agg(a.role) FROM admin_roles a WHERE a.user_id = u.id), '[]') AS roles
-       FROM users u LEFT JOIN user_profiles p ON p.user_id = u.id
-      WHERE u.id = $1`,
-    [userId],
+async function issueSession(req: FastifyRequest, userId: string, deviceId: string | null = null) {
+  const refresh = newToken();
+  const s = await query(
+    `INSERT INTO user_sessions (user_id, device_id, refresh_token_hash, user_agent, ip, expires_at)
+     VALUES ($1,$2,$3,$4,$5, now() + ($6 || ' days')::interval) RETURNING id`,
+    [userId, deviceId, sha256(refresh), req.headers["user-agent"]?.slice(0, 300) ?? null, req.ip, String(config.REFRESH_TOKEN_TTL_DAYS)],
   );
-  const u = r.rows[0];
-  if (!u) throw new HttpError(404, "not_found");
-  return {
-    id: u.id,
-    email: u.email,
-    status: u.status,
-    createdAt: u.created_at,
-    displayName: u.display_name,
-    locale: u.locale,
-    preferences: u.preferences ?? {},
-    isAdmin: u.is_admin,
-    isSupport: u.is_support,
-    roles: u.roles,
-  };
-}
-
-async function activeUserByEmail(email: string) {
-  const r = await query(`SELECT id, password_hash, status FROM users WHERE email = $1`, [email]);
-  return r.rows[0] as { id: string; password_hash: string; status: string } | undefined;
+  const access = await signAccessToken(userId, s.rows[0].id);
+  return { access_token: access, refresh_token: refresh, expires_in: config.ACCESS_TOKEN_TTL_SECONDS };
 }
 
 export async function authRoutes(app: FastifyInstance) {
-  app.post("/auth/register", async (req, reply) => {
-    const body = z
-      .object({
-        email: emailSchema,
-        password: passwordSchema,
-        displayName: z.string().trim().max(120).optional(),
-        device: sessionSchema.optional(),
-      })
-      .parse(req.body);
+  const strict = { config: { rateLimit: { max: config.NODE_ENV === "test" ? 100000 : 10, timeWindow: "1 minute" } } };
 
-    const hash = await hashPassword(body.password);
+  app.post("/auth/register", strict, async (req, reply) => {
+    const b = z.object({ email, password, display_name: z.string().trim().max(100).optional() }).parse(req.body);
+    const hash = await hashPassword(b.password);
     const userId = await tx(async (c) => {
-      const u = await c.query(
-        `INSERT INTO users (email, password_hash) VALUES ($1,$2) RETURNING id`,
-        [body.email, hash],
-      );
-      const id = u.rows[0].id as string;
-      await c.query(`INSERT INTO user_profiles (user_id, display_name) VALUES ($1,$2)`, [
-        id,
-        body.displayName ?? null,
-      ]);
-      return id;
+      const u = await c.query(`INSERT INTO users (email, password_hash) VALUES ($1,$2) ON CONFLICT DO NOTHING RETURNING id`, [b.email, hash]);
+      if (!u.rowCount) throw new HttpError(409, "email_in_use");
+      await c.query(`INSERT INTO user_profiles (user_id, display_name) VALUES ($1,$2)`, [u.rows[0].id, b.display_name ?? null]);
+      return u.rows[0].id as string;
     });
-
-    let deviceId: string | null = null;
-    if (body.device) {
-      const d = await query(
-        `INSERT INTO user_devices (user_id, name, platform, app_version, last_seen_at) VALUES ($1,$2,$3,$4, now()) RETURNING id`,
-        [userId, body.device.name, body.device.platform, body.device.appVersion ?? null],
-      );
-      deviceId = d.rows[0].id;
-    }
-
-    const tokens = await createSession(userId, deviceId, req.headers["user-agent"], req.ip);
     await audit(req, "auth.register", { actor: userId, target: userId });
-    reply.status(201);
-    return { user: await userPayload(userId), ...tokens };
+    return reply.status(201).send(await issueSession(req, userId));
   });
 
-  app.post("/auth/login", async (req) => {
-    const body = z
-      .object({
-        email: emailSchema,
-        password: z.string().min(1).max(200),
-        device: sessionSchema.optional(),
-      })
-      .parse(req.body);
-
-    const user = await activeUserByEmail(body.email);
-    const ok = user ? await verifyPassword(user.password_hash, body.password) : false;
-    if (!user || !ok) throw new HttpError(401, "invalid_credentials");
-    if (user.status !== "active") throw new HttpError(403, "account_suspended");
-
-    let deviceId: string | null = null;
-    if (body.device) {
-      const existing = await query(
-        `SELECT id FROM user_devices WHERE user_id = $1 AND name = $2 AND platform = $3 AND revoked_at IS NULL LIMIT 1`,
-        [user.id, body.device.name, body.device.platform],
-      );
-      if (existing.rowCount) {
-        deviceId = existing.rows[0].id;
-        await query(
-          `UPDATE user_devices SET last_seen_at = now(), app_version = $2 WHERE id = $1`,
-          [deviceId, body.device.appVersion ?? null],
-        );
-      } else {
-        const d = await query(
-          `INSERT INTO user_devices (user_id, name, platform, app_version, last_seen_at) VALUES ($1,$2,$3,$4, now()) RETURNING id`,
-          [user.id, body.device.name, body.device.platform, body.device.appVersion ?? null],
-        );
-        deviceId = d.rows[0].id;
-      }
+  app.post("/auth/login", strict, async (req) => {
+    const b = z.object({ email, password: z.string().min(1).max(256) }).parse(req.body);
+    const r = await query(`SELECT id, password_hash, status FROM users WHERE email = $1`, [b.email]);
+    const u = r.rows[0];
+    const ok = u ? await verifyPassword(u.password_hash, b.password) : (await hashPassword(b.password), false);
+    if (!u || !ok) {
+      await audit(req, "auth.login_failed", { actor: null, target: u?.id ?? null, details: { email: b.email } });
+      throw new HttpError(401, "invalid_credentials");
     }
-
-    const tokens = await createSession(user.id, deviceId, req.headers["user-agent"], req.ip);
-    await audit(req, "auth.login", { actor: user.id, target: user.id });
-    return { user: await userPayload(user.id), ...tokens };
+    if (u.status !== "active") throw new HttpError(403, "account_suspended");
+    await audit(req, "auth.login", { actor: u.id, target: u.id });
+    return issueSession(req, u.id);
   });
 
-  app.post("/auth/refresh", async (req) => {
-    const body = z.object({ refreshToken: z.string().min(20).max(200) }).parse(req.body);
-    const hash = sha256(body.refreshToken);
-
-    const result = await tx(async (c) => {
-      const s = await c.query(
-        `SELECT s.id, s.user_id, s.device_id, s.user_agent, s.ip, u.status
-           FROM user_sessions s JOIN users u ON u.id = s.user_id
-          WHERE s.refresh_token_hash = $1 AND s.revoked_at IS NULL AND s.expires_at > now()
-          FOR UPDATE`,
-        [hash],
-      );
-      const session = s.rows[0];
-      if (!session) throw new HttpError(401, "invalid_refresh_token");
-      if (session.status !== "active") throw new HttpError(403, "account_suspended");
-
-      await c.query(`UPDATE user_sessions SET revoked_at = now() WHERE id = $1`, [session.id]);
-
-      const refreshToken = newToken();
-      const created = await c.query(
-        `INSERT INTO user_sessions (user_id, device_id, refresh_token_hash, user_agent, ip, expires_at)
-         VALUES ($1,$2,$3,$4,$5, now() + ($6 || ' days')::interval) RETURNING id`,
-        [
-          session.user_id,
-          session.device_id,
-          sha256(refreshToken),
-          session.user_agent,
-          session.ip,
-          String(config.REFRESH_TOKEN_TTL_DAYS),
-        ],
-      );
-      return {
-        userId: session.user_id as string,
-        sessionId: created.rows[0].id as string,
-        refreshToken,
-      };
-    });
-
-    const accessToken = await signAccessToken(result.userId, result.sessionId);
-    return {
-      accessToken,
-      refreshToken: result.refreshToken,
-      expiresIn: config.ACCESS_TOKEN_TTL_SECONDS,
-    };
+  app.post("/auth/refresh", strict, async (req) => {
+    const b = refreshBody.parse(req.body);
+    // Rotation: the used refresh token is revoked and a new one issued.
+    const r = await query(
+      `UPDATE user_sessions SET revoked_at = now()
+        WHERE refresh_token_hash = $1 AND revoked_at IS NULL AND expires_at > now()
+        RETURNING user_id, device_id`,
+      [sha256(b.refresh_token)],
+    );
+    if (!r.rowCount) throw new HttpError(401, "invalid_refresh_token");
+    const st = await query(`SELECT status FROM users WHERE id = $1`, [r.rows[0].user_id]);
+    if (st.rows[0]?.status !== "active") throw new HttpError(403, "account_suspended");
+    return issueSession(req, r.rows[0].user_id, r.rows[0].device_id);
   });
 
   app.post("/auth/logout", async (req, reply) => {
-    const body = z
-      .object({
-        refreshToken: z.string().min(20).max(200).optional(),
-        allSessions: z.boolean().optional(),
-      })
-      .parse(req.body ?? {});
-    if (body.allSessions) {
-      await requireAuth(req, reply);
-      await query(
-        `UPDATE user_sessions SET revoked_at = now() WHERE user_id = $1 AND revoked_at IS NULL`,
-        [req.user!.id],
-      );
-      await audit(req, "auth.logout_all");
-    } else if (body.refreshToken) {
-      await query(
-        `UPDATE user_sessions SET revoked_at = now() WHERE refresh_token_hash = $1 AND revoked_at IS NULL`,
-        [sha256(body.refreshToken)],
-      );
-      await audit(req, "auth.logout");
-    } else {
-      throw new HttpError(400, "refresh_token_required");
-    }
-    return { ok: true };
+    const b = refreshBody.parse(req.body);
+    const r = await query(
+      `UPDATE user_sessions SET revoked_at = now() WHERE refresh_token_hash = $1 AND revoked_at IS NULL RETURNING user_id`,
+      [sha256(b.refresh_token)],
+    );
+    if (r.rowCount) await audit(req, "auth.logout", { actor: r.rows[0].user_id, target: r.rows[0].user_id });
+    return reply.status(204).send();
   });
 
-  app.post("/auth/forgot-password", async (req) => {
-    const body = z.object({ email: emailSchema }).parse(req.body);
-    const user = await activeUserByEmail(body.email);
-    if (user) {
+  app.post("/auth/forgot-password", strict, async (req, reply) => {
+    const b = z.object({ email }).parse(req.body);
+    const r = await query(`SELECT id FROM users WHERE email = $1 AND status = 'active'`, [b.email]);
+    if (r.rowCount) {
       const token = newToken();
-      await query(
-        `INSERT INTO password_resets (user_id, token_hash, expires_at) VALUES ($1,$2, now() + interval '1 hour')`,
-        [user.id, sha256(token)],
-      );
-      const url = `${config.APP_RESET_URL}${config.APP_RESET_URL.includes("?") ? "&" : "?"}token=${encodeURIComponent(token)}`;
-      await sendMail(
-        body.email,
-        "Redefinição de senha — HASi",
-        `Use este link para redefinir sua senha (válido por 1 hora):\n\n${url}`,
-        req.log,
-      );
-      await audit(req, "auth.forgot_password", { actor: user.id, target: user.id });
+      await query(`INSERT INTO password_resets (user_id, token_hash, expires_at) VALUES ($1,$2, now() + interval '30 minutes')`, [r.rows[0].id, sha256(token)]);
+      const url = `${config.APP_RESET_URL}?token=${encodeURIComponent(token)}`;
+      await sendMail(b.email, "HASi - redefinir senha", `Para redefinir sua senha acesse (válido por 30 minutos):\n${url}`, req.log);
+      await audit(req, "auth.forgot_password", { actor: null, target: r.rows[0].id });
     }
-    return { ok: true };
+    return reply.status(202).send({ ok: true }); // same answer whether or not the account exists
   });
 
-  app.post("/auth/reset-password", async (req) => {
-    const body = z
-      .object({ token: z.string().min(20).max(200), password: passwordSchema })
-      .parse(req.body);
-    const hash = await hashPassword(body.password);
-
-    await tx(async (c) => {
+  app.post("/auth/reset-password", strict, async (req, reply) => {
+    const b = z.object({ token: z.string().min(20).max(200), password }).parse(req.body);
+    const hash = await hashPassword(b.password);
+    const userId = await tx(async (c) => {
       const r = await c.query(
-        `SELECT id, user_id FROM password_resets
-          WHERE token_hash = $1 AND used_at IS NULL AND expires_at > now() FOR UPDATE`,
-        [sha256(body.token)],
+        `UPDATE password_resets SET used_at = now() WHERE token_hash = $1 AND used_at IS NULL AND expires_at > now() RETURNING user_id`,
+        [sha256(b.token)],
       );
-      const reset = r.rows[0];
-      if (!reset) throw new HttpError(400, "invalid_or_expired_token");
-      await c.query(`UPDATE password_resets SET used_at = now() WHERE id = $1`, [reset.id]);
-      await c.query(`UPDATE users SET password_hash = $2, updated_at = now() WHERE id = $1`, [
-        reset.user_id,
-        hash,
-      ]);
-      await c.query(
-        `UPDATE user_sessions SET revoked_at = now() WHERE user_id = $1 AND revoked_at IS NULL`,
-        [reset.user_id],
-      );
-      await c.query(
-        `UPDATE password_resets SET used_at = now() WHERE user_id = $1 AND used_at IS NULL`,
-        [reset.user_id],
-      );
+      if (!r.rowCount) throw new HttpError(400, "invalid_or_expired_token");
+      const uid = r.rows[0].user_id;
+      await c.query(`UPDATE users SET password_hash = $1, updated_at = now() WHERE id = $2`, [hash, uid]);
+      await c.query(`UPDATE user_sessions SET revoked_at = now() WHERE user_id = $1 AND revoked_at IS NULL`, [uid]);
+      return uid as string;
     });
-
-    await audit(req, "auth.reset_password");
-    return { ok: true };
+    await audit(req, "auth.reset_password", { actor: userId, target: userId });
+    return reply.status(204).send();
   });
-}
-
-/** Used by the health check / graceful shutdown helper in tests. */
-export async function disconnect() {
-  await pool.end();
 }

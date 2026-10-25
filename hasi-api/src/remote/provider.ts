@@ -18,15 +18,8 @@ export interface RemoteCallResult {
 
 export interface RemoteExecutionProvider {
   readonly name: string;
-  startSession(input: {
-    userId: string;
-    deviceId?: string;
-    agentId?: string;
-  }): Promise<RemoteSessionHandle>;
-  call(
-    handle: RemoteSessionHandle,
-    input: { prompt: string; model?: string },
-  ): Promise<RemoteCallResult>;
+  startSession(input: { userId: string; deviceId?: string; agentId?: string }): Promise<RemoteSessionHandle>;
+  call(handle: RemoteSessionHandle, input: { prompt: string; model?: string }): Promise<RemoteCallResult>;
   endSession(handle: RemoteSessionHandle): Promise<void>;
 }
 

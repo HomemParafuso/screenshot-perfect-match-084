@@ -1,12 +1,7 @@
 import nodemailer from "nodemailer";
 import { config } from "./config.js";
 
-export async function sendMail(
-  to: string,
-  subject: string,
-  text: string,
-  log: { warn: (m: string) => void },
-) {
+export async function sendMail(to: string, subject: string, text: string, log: { warn: (m: string) => void }) {
   if (!config.SMTP_HOST) {
     log.warn("SMTP_HOST not configured: password reset e-mail was not sent");
     return;

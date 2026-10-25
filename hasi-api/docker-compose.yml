@@ -10,7 +10,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - pgdata:/var/lib/postgresql/data
-    networks: [internal] # no "ports": PostgreSQL is never published
+    networks: [internal]          # no "ports": PostgreSQL is never published
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
@@ -39,12 +39,7 @@ services:
     volumes:
       - ./backups:/backups
       - ./scripts/backup.sh:/backup.sh:ro
-    entrypoint:
-      [
-        "/bin/sh",
-        "-c",
-        "while true; do /bin/sh /backup.sh; sleep ${BACKUP_INTERVAL_SECONDS:-86400}; done",
-      ]
+    entrypoint: ["/bin/sh", "-c", "while true; do /bin/sh /backup.sh; sleep ${BACKUP_INTERVAL_SECONDS:-86400}; done"]
     depends_on:
       db: { condition: service_healthy }
     networks: [internal]
