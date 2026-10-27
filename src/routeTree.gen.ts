@@ -15,9 +15,16 @@ import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AdminAgentsRouteImport } from './routes/_admin.agents'
+import { Route as AdminAuditRouteImport } from './routes/_admin.audit'
 import { Route as AdminDashboardRouteImport } from './routes/_admin.dashboard'
+import { Route as AdminDevicesRouteImport } from './routes/_admin.devices'
 import { Route as AdminEntitlementsRouteImport } from './routes/_admin.entitlements'
 import { Route as AdminPlansRouteImport } from './routes/_admin.plans'
+import { Route as AdminProviderKeysRouteImport } from './routes/_admin.provider-keys'
+import { Route as AdminRemoteUsageRouteImport } from './routes/_admin.remote-usage'
+import { Route as AdminSkillsRouteImport } from './routes/_admin.skills'
+import { Route as AdminSubscriptionsRouteImport } from './routes/_admin.subscriptions'
 import { Route as AdminUsersIndexRouteImport } from './routes/_admin.users.index'
 import { Route as AdminUsersIdRouteImport } from './routes/_admin.users.$id'
 
@@ -50,9 +57,24 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminAgentsRoute = AdminAgentsRouteImport.update({
+  id: '/agents',
+  path: '/agents',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAuditRoute = AdminAuditRouteImport.update({
+  id: '/audit',
+  path: '/audit',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminDevicesRoute = AdminDevicesRouteImport.update({
+  id: '/devices',
+  path: '/devices',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminEntitlementsRoute = AdminEntitlementsRouteImport.update({
@@ -63,6 +85,26 @@ const AdminEntitlementsRoute = AdminEntitlementsRouteImport.update({
 const AdminPlansRoute = AdminPlansRouteImport.update({
   id: '/plans',
   path: '/plans',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminProviderKeysRoute = AdminProviderKeysRouteImport.update({
+  id: '/provider-keys',
+  path: '/provider-keys',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRemoteUsageRoute = AdminRemoteUsageRouteImport.update({
+  id: '/remote-usage',
+  path: '/remote-usage',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSkillsRoute = AdminSkillsRouteImport.update({
+  id: '/skills',
+  path: '/skills',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSubscriptionsRoute = AdminSubscriptionsRouteImport.update({
+  id: '/subscriptions',
+  path: '/subscriptions',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminUsersIndexRoute = AdminUsersIndexRouteImport.update({
@@ -82,9 +124,16 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/agents': typeof AdminAgentsRoute
+  '/audit': typeof AdminAuditRoute
   '/dashboard': typeof AdminDashboardRoute
+  '/devices': typeof AdminDevicesRoute
   '/entitlements': typeof AdminEntitlementsRoute
   '/plans': typeof AdminPlansRoute
+  '/provider-keys': typeof AdminProviderKeysRoute
+  '/remote-usage': typeof AdminRemoteUsageRoute
+  '/skills': typeof AdminSkillsRoute
+  '/subscriptions': typeof AdminSubscriptionsRoute
   '/users/$id': typeof AdminUsersIdRoute
   '/users/': typeof AdminUsersIndexRoute
 }
@@ -94,9 +143,16 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/agents': typeof AdminAgentsRoute
+  '/audit': typeof AdminAuditRoute
   '/dashboard': typeof AdminDashboardRoute
+  '/devices': typeof AdminDevicesRoute
   '/entitlements': typeof AdminEntitlementsRoute
   '/plans': typeof AdminPlansRoute
+  '/provider-keys': typeof AdminProviderKeysRoute
+  '/remote-usage': typeof AdminRemoteUsageRoute
+  '/skills': typeof AdminSkillsRoute
+  '/subscriptions': typeof AdminSubscriptionsRoute
   '/users/$id': typeof AdminUsersIdRoute
   '/users': typeof AdminUsersIndexRoute
 }
@@ -108,9 +164,16 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/_admin/agents': typeof AdminAgentsRoute
+  '/_admin/audit': typeof AdminAuditRoute
   '/_admin/dashboard': typeof AdminDashboardRoute
+  '/_admin/devices': typeof AdminDevicesRoute
   '/_admin/entitlements': typeof AdminEntitlementsRoute
   '/_admin/plans': typeof AdminPlansRoute
+  '/_admin/provider-keys': typeof AdminProviderKeysRoute
+  '/_admin/remote-usage': typeof AdminRemoteUsageRoute
+  '/_admin/skills': typeof AdminSkillsRoute
+  '/_admin/subscriptions': typeof AdminSubscriptionsRoute
   '/_admin/users/$id': typeof AdminUsersIdRoute
   '/_admin/users/': typeof AdminUsersIndexRoute
 }
@@ -122,9 +185,16 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/reset-password'
+    | '/agents'
+    | '/audit'
     | '/dashboard'
+    | '/devices'
     | '/entitlements'
     | '/plans'
+    | '/provider-keys'
+    | '/remote-usage'
+    | '/skills'
+    | '/subscriptions'
     | '/users/$id'
     | '/users/'
   fileRoutesByTo: FileRoutesByTo
@@ -134,9 +204,16 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/reset-password'
+    | '/agents'
+    | '/audit'
     | '/dashboard'
+    | '/devices'
     | '/entitlements'
     | '/plans'
+    | '/provider-keys'
+    | '/remote-usage'
+    | '/skills'
+    | '/subscriptions'
     | '/users/$id'
     | '/users'
   id:
@@ -147,9 +224,16 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/reset-password'
+    | '/_admin/agents'
+    | '/_admin/audit'
     | '/_admin/dashboard'
+    | '/_admin/devices'
     | '/_admin/entitlements'
     | '/_admin/plans'
+    | '/_admin/provider-keys'
+    | '/_admin/remote-usage'
+    | '/_admin/skills'
+    | '/_admin/subscriptions'
     | '/_admin/users/$id'
     | '/_admin/users/'
   fileRoutesById: FileRoutesById
@@ -207,11 +291,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_admin/agents': {
+      id: '/_admin/agents'
+      path: '/agents'
+      fullPath: '/agents'
+      preLoaderRoute: typeof AdminAgentsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/_admin/audit': {
+      id: '/_admin/audit'
+      path: '/audit'
+      fullPath: '/audit'
+      preLoaderRoute: typeof AdminAuditRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/_admin/dashboard': {
       id: '/_admin/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/_admin/devices': {
+      id: '/_admin/devices'
+      path: '/devices'
+      fullPath: '/devices'
+      preLoaderRoute: typeof AdminDevicesRouteImport
       parentRoute: typeof AdminRoute
     }
     '/_admin/entitlements': {
@@ -226,6 +331,34 @@ declare module '@tanstack/react-router' {
       path: '/plans'
       fullPath: '/plans'
       preLoaderRoute: typeof AdminPlansRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/_admin/provider-keys': {
+      id: '/_admin/provider-keys'
+      path: '/provider-keys'
+      fullPath: '/provider-keys'
+      preLoaderRoute: typeof AdminProviderKeysRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/_admin/remote-usage': {
+      id: '/_admin/remote-usage'
+      path: '/remote-usage'
+      fullPath: '/remote-usage'
+      preLoaderRoute: typeof AdminRemoteUsageRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/_admin/skills': {
+      id: '/_admin/skills'
+      path: '/skills'
+      fullPath: '/skills'
+      preLoaderRoute: typeof AdminSkillsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/_admin/subscriptions': {
+      id: '/_admin/subscriptions'
+      path: '/subscriptions'
+      fullPath: '/subscriptions'
+      preLoaderRoute: typeof AdminSubscriptionsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/_admin/users/': {
@@ -246,17 +379,31 @@ declare module '@tanstack/react-router' {
 }
 
 interface AdminRouteChildren {
+  AdminAgentsRoute: typeof AdminAgentsRoute
+  AdminAuditRoute: typeof AdminAuditRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminDevicesRoute: typeof AdminDevicesRoute
   AdminEntitlementsRoute: typeof AdminEntitlementsRoute
   AdminPlansRoute: typeof AdminPlansRoute
+  AdminProviderKeysRoute: typeof AdminProviderKeysRoute
+  AdminRemoteUsageRoute: typeof AdminRemoteUsageRoute
+  AdminSkillsRoute: typeof AdminSkillsRoute
+  AdminSubscriptionsRoute: typeof AdminSubscriptionsRoute
   AdminUsersIdRoute: typeof AdminUsersIdRoute
   AdminUsersIndexRoute: typeof AdminUsersIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAgentsRoute: AdminAgentsRoute,
+  AdminAuditRoute: AdminAuditRoute,
   AdminDashboardRoute: AdminDashboardRoute,
+  AdminDevicesRoute: AdminDevicesRoute,
   AdminEntitlementsRoute: AdminEntitlementsRoute,
   AdminPlansRoute: AdminPlansRoute,
+  AdminProviderKeysRoute: AdminProviderKeysRoute,
+  AdminRemoteUsageRoute: AdminRemoteUsageRoute,
+  AdminSkillsRoute: AdminSkillsRoute,
+  AdminSubscriptionsRoute: AdminSubscriptionsRoute,
   AdminUsersIdRoute: AdminUsersIdRoute,
   AdminUsersIndexRoute: AdminUsersIndexRoute,
 }
