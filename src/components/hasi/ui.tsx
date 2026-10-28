@@ -59,7 +59,7 @@ const tones: Record<string, string> = {
 
 export function Pill({ tone, children }: { tone: string; children: ReactNode }) {
   return (
-    <span className={cn("inline-flex items-center rounded border px-1.5 py-0.5 font-mono text-[0.68rem] uppercase tracking-wider", tones[tone] ?? tones.canceled)}>
+    <span className={cn("inline-flex items-center rounded border px-1.5 py-0.5 font-mono text-[0.68rem] uppercase tracking-wider", tones[tone] ?? tones["canceled"])}>
       {children}
     </span>
   );

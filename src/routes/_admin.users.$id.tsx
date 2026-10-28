@@ -140,7 +140,7 @@ const SimpleList = ({ items }: { items: { id: string; name: string; description:
 
 function SubscriptionEditor({ userId, current, onSave }: {
   userId: string;
-  current?: { status: string; plan_id: string; plan_name: string; current_period_end: string };
+  current: { status: string; plan_id: string; plan_name: string; current_period_end: string } | undefined;
   onSave: (fn: () => Promise<unknown>) => void;
 }) {
   const plans = useApi<{ id: string; name: string; is_active: boolean }[]>("/admin/plans");

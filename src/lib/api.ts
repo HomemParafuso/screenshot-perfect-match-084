@@ -26,7 +26,7 @@ export function getApiUrl(): string {
     const saved = window.localStorage.getItem(API_KEY);
     if (saved) return saved;
   }
-  return (import.meta.env.VITE_HASI_API_URL as string | undefined) ?? "";
+  return (import.meta.env["VITE_HASI_API_URL"] as string | undefined) ?? "";
 }
 export function setApiUrl(url: string) {
   window.localStorage.setItem(API_KEY, url.replace(/\/+$/, ""));
