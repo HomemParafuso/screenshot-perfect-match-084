@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { getApiUrl, setApiUrl } from "@/lib/api";
 import { Input } from "@/components/ui/input";
 
@@ -25,10 +25,16 @@ export function AuthShell({ title, subtitle, children }: { title: string; subtit
 }
 
 function ApiUrlField() {
-  const [url, setUrl] = useState(() => (typeof window === "undefined" ? "" : getApiUrl()));
+  const [url, setUrl] = useState("");
   const [saved, setSaved] = useState(false);
+  const [initial, setInitial] = useState<string | null>(null);
+  useEffect(() => {
+    const u = getApiUrl();
+    setUrl(u);
+    setInitial(u);
+  }, []);
   return (
-    <details className="mt-4 text-xs text-muted-foreground" open={!url}>
+    <details className="mt-4 text-xs text-muted-foreground" open={initial === ""}>
       <summary className="label-mono cursor-pointer">Servidor da API</summary>
       <form
         className="mt-2 flex gap-2"

@@ -86,3 +86,7 @@ Administrador: `GET /admin/stats`, `GET|POST /admin/users`, `GET /admin/users/:i
 
 Estados de assinatura: `trial`, `active` (liberam recursos), `past_due`, `canceled`, `suspended` (não liberam).
 Recursos: `mobile_assistant`, `local_opencode`, `custom_skills`, `custom_agents`, `remote_coding`, `remote_session_limit`, `monthly_remote_calls`, `monthly_remote_tokens`.
+
+## Painel administrativo
+
+O painel (projeto Lovable) chama esta API pelo endereço definido em `VITE_HASI_API_URL` no build, ou pelo campo "Servidor da API" na tela de login. Inclua a URL do painel em `CORS_ORIGINS` e aponte `APP_RESET_URL` para `<painel>/reset-password`.
