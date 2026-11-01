@@ -13,7 +13,7 @@ import { errorMessage, post } from "@/lib/api";
 import { fmtDate } from "@/lib/format";
 
 export const Route = createFileRoute("/_admin/users/")({
-  head: () => ({ meta: [{ title: "Usuários — HASi Control Plane" }] }),
+  head: () => ({ meta: [{ title: "Usuários — HASi Control Plane" }, { name: "description", content: "Usuários no painel administrativo HASi." }, { property: "og:title", content: "Usuários — HASi Control Plane" }, { property: "og:description", content: "Usuários no painel administrativo HASi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: UsersPage,
 });
 

@@ -11,7 +11,7 @@ import { errorMessage, post, put } from "@/lib/api";
 import { FEATURE_LABELS, fmtDate, SUB_STATUS } from "@/lib/format";
 
 export const Route = createFileRoute("/_admin/users/$id")({
-  head: () => ({ meta: [{ title: "Detalhes do usuário — HASi Control Plane" }] }),
+  head: () => ({ meta: [{ title: "Detalhes do usuário — HASi Control Plane" }, { name: "description", content: "Detalhes do usuário no painel administrativo HASi." }, { property: "og:title", content: "Detalhes do usuário — HASi Control Plane" }, { property: "og:description", content: "Detalhes do usuário no painel administrativo HASi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: UserDetail,
 });
 

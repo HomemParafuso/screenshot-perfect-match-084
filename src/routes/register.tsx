@@ -7,7 +7,7 @@ import { AuthShell } from "@/components/hasi/AuthShell";
 import { errorMessage, register } from "@/lib/api";
 
 export const Route = createFileRoute("/register")({
-  head: () => ({ meta: [{ title: "Cadastro — HASi Control Plane" }, { name: "description", content: "Criar conta no HASi." }] }),
+  head: () => ({ meta: [{ title: "Cadastro — HASi Control Plane" }, { name: "description", content: "Criar conta no HASi." }, { property: "og:title", content: "Cadastro — HASi Control Plane" }, { property: "og:description", content: "Criar conta no HASi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: RegisterPage,
 });
 

@@ -5,7 +5,7 @@ import { UserLink } from "@/components/hasi/UserLink";
 import { fmtDate, fmtNum } from "@/lib/format";
 
 export const Route = createFileRoute("/_admin/remote-usage")({
-  head: () => ({ meta: [{ title: "Uso remoto — HASi Control Plane" }] }),
+  head: () => ({ meta: [{ title: "Uso remoto — HASi Control Plane" }, { name: "description", content: "Uso remoto no painel administrativo HASi." }, { property: "og:title", content: "Uso remoto — HASi Control Plane" }, { property: "og:description", content: "Uso remoto no painel administrativo HASi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: RemotePage,
 });
 

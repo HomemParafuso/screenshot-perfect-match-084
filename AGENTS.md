@@ -13,3 +13,4 @@
 - The backend is self-hosted (Node/Fastify + own PostgreSQL via Docker Compose) and lives in `hasi-api/`; never use Lovable Cloud/Supabase/Firebase — the user requires a self-hosted database.
 - The admin panel in `src/` talks to that API only through `src/lib/api.ts` (base URL from VITE_HASI_API_URL or the login-screen setting); keep auth tokens out of SSR because the session lives in the browser.
 - `hasi-api/` has its own package.json, tsconfig and tests; it is not part of the Vite build.
+- Explicit demo mode uses a browser-only adapter through src/lib/api.ts with isolated sessionStorage; never send demo credentials or data to the real API, and never treat demo access as server authorization.

@@ -3,6 +3,8 @@
  * Base URL: VITE_HASI_API_URL at build time, or a value saved on the login screen.
  * Access token lives only in memory; the refresh token is kept in localStorage.
  */
+import { demoRequest, DemoError, endDemoSession, hasDemoSession, loginDemo } from "./demo-api";
+export { hasDemoSession } from "./demo-api";
 const API_KEY = "hasi.apiUrl";
 const REFRESH_KEY = "hasi.refresh";
 
@@ -43,6 +45,10 @@ function storeTokens(t: Tokens | null) {
 }
 
 async function raw(path: string, init: RequestInit = {}, token?: string | null) {
+  if (hasDemoSession()) {
+    try { return await demoRequest(path, init); }
+    catch (e) { if (e instanceof DemoError) throw new ApiError(e.status, e.code); throw e; }
+  }
   const base = getApiUrl();
   if (!base) throw new ApiError(0, "api_url_missing", "Endereço da API não configurado.");
   const headers: Record<string, string> = { ...(init.body ? { "content-type": "application/json" } : {}) };
@@ -73,7 +79,7 @@ export async function refreshSession(): Promise<boolean> {
 }
 
 export async function api<T = any>(path: string, init: RequestInit = {}): Promise<T> {
-  if (!accessToken) await refreshSession();
+  if (!accessToken && !hasDemoSession()) await refreshSession();
   try {
     return await raw(path, init, accessToken);
   } catch (e) {
@@ -82,15 +88,23 @@ export async function api<T = any>(path: string, init: RequestInit = {}): Promis
   }
 }
 
-export const hasSession = () => !!accessToken || !!getRefresh();
+export const hasSession = () => hasDemoSession() || !!accessToken || !!getRefresh();
+
+export async function enterDemo(email: string, password: string) {
+  try { await loginDemo(email, password); }
+  catch (e) { if (e instanceof DemoError) throw new ApiError(e.status, e.code); throw e; }
+  emit();
+}
 
 export async function login(email: string, password: string) {
+  endDemoSession();
   storeTokens(await raw("/auth/login", { method: "POST", body: JSON.stringify({ email, password }) }));
 }
 export async function register(email: string, password: string, display_name?: string) {
   storeTokens(await raw("/auth/register", { method: "POST", body: JSON.stringify({ email, password, display_name }) }));
 }
 export async function logout() {
+  if (hasDemoSession()) { endDemoSession(); emit(); return; }
   const rt = getRefresh();
   if (rt) await raw("/auth/logout", { method: "POST", body: JSON.stringify({ refresh_token: rt }) }).catch(() => {});
   storeTokens(null);

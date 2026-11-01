@@ -3,7 +3,7 @@ import { DataState, PageHeader, Stat, useApi } from "@/components/hasi/ui";
 import { fmtNum } from "@/lib/format";
 
 export const Route = createFileRoute("/_admin/dashboard")({
-  head: () => ({ meta: [{ title: "Dashboard — HASi Control Plane" }] }),
+  head: () => ({ meta: [{ title: "Dashboard — HASi Control Plane" }, { name: "description", content: "Dashboard no painel administrativo HASi." }, { property: "og:title", content: "Dashboard — HASi Control Plane" }, { property: "og:description", content: "Dashboard no painel administrativo HASi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Dashboard,
 });
 

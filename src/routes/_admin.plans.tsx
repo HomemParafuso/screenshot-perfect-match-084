@@ -13,7 +13,7 @@ import { errorMessage, patch, post } from "@/lib/api";
 import { fmtMoney } from "@/lib/format";
 
 export const Route = createFileRoute("/_admin/plans")({
-  head: () => ({ meta: [{ title: "Planos — HASi Control Plane" }] }),
+  head: () => ({ meta: [{ title: "Planos — HASi Control Plane" }, { name: "description", content: "Planos no painel administrativo HASi." }, { property: "og:title", content: "Planos — HASi Control Plane" }, { property: "og:description", content: "Planos no painel administrativo HASi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: PlansPage,
 });
 

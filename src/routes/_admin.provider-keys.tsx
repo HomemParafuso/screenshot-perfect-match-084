@@ -5,7 +5,7 @@ import { UserLink } from "@/components/hasi/UserLink";
 import { fmtDate } from "@/lib/format";
 
 export const Route = createFileRoute("/_admin/provider-keys")({
-  head: () => ({ meta: [{ title: "Provedores e chaves BYOK — HASi Control Plane" }] }),
+  head: () => ({ meta: [{ title: "Provedores e chaves BYOK — HASi Control Plane" }, { name: "description", content: "Provedores e chaves BYOK no painel administrativo HASi." }, { property: "og:title", content: "Provedores e chaves BYOK — HASi Control Plane" }, { property: "og:description", content: "Provedores e chaves BYOK no painel administrativo HASi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: KeysPage,
 });
 
