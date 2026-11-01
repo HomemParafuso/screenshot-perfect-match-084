@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { DEMO_EMAIL } from "@/lib/demo-api";
 
 export const Route = createFileRoute("/login")({
-  head: () => ({ meta: [{ title: "Entrar — HASi Control Plane" }, { name: "description", content: "Acesso ao painel administrativo do HASi." }] }),
+  head: () => ({ meta: [{ title: "Entrar — HASi Control Plane" }, { name: "description", content: "Acesso ao painel administrativo do HASi." }, { property: "og:title", content: "Entrar — HASi Control Plane" }, { property: "og:description", content: "Acesso ao painel administrativo do HASi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: LoginPage,
 });
 

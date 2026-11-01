@@ -5,7 +5,7 @@ import { UserLink } from "@/components/hasi/UserLink";
 import { fmtDate } from "@/lib/format";
 
 export const Route = createFileRoute("/_admin/skills")({
-  head: () => ({ meta: [{ title: "Skills — HASi Control Plane" }] }),
+  head: () => ({ meta: [{ title: "Skills — HASi Control Plane" }, { name: "description", content: "Skills no painel administrativo HASi." }, { property: "og:title", content: "Skills — HASi Control Plane" }, { property: "og:description", content: "Skills no painel administrativo HASi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: () => <ItemsPage path="/admin/skills" kicker="Usuários" title="Skills dos usuários" empty="Nenhuma skill cadastrada." />,
 });
 

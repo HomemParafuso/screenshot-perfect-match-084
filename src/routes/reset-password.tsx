@@ -9,7 +9,7 @@ import { errorMessage, resetPassword } from "@/lib/api";
 
 export const Route = createFileRoute("/reset-password")({
   validateSearch: z.object({ token: z.string().optional() }),
-  head: () => ({ meta: [{ title: "Nova senha — HASi Control Plane" }, { name: "description", content: "Definir nova senha." }] }),
+  head: () => ({ meta: [{ title: "Nova senha — HASi Control Plane" }, { name: "description", content: "Definir nova senha." }, { property: "og:title", content: "Nova senha — HASi Control Plane" }, { property: "og:description", content: "Definir nova senha." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: ResetPage,
 });
 

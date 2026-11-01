@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { fmtDate, SUB_STATUS } from "@/lib/format";
 
 export const Route = createFileRoute("/_admin/subscriptions")({
-  head: () => ({ meta: [{ title: "Assinaturas — HASi Control Plane" }] }),
+  head: () => ({ meta: [{ title: "Assinaturas — HASi Control Plane" }, { name: "description", content: "Assinaturas no painel administrativo HASi." }, { property: "og:title", content: "Assinaturas — HASi Control Plane" }, { property: "og:description", content: "Assinaturas no painel administrativo HASi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: SubsPage,
 });
 

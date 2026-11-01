@@ -11,7 +11,7 @@ import { FEATURE_LABELS } from "@/lib/format";
 import type { Plan } from "./_admin.plans";
 
 export const Route = createFileRoute("/_admin/entitlements")({
-  head: () => ({ meta: [{ title: "Entitlements — HASi Control Plane" }] }),
+  head: () => ({ meta: [{ title: "Entitlements — HASi Control Plane" }, { name: "description", content: "Entitlements no painel administrativo HASi." }, { property: "og:title", content: "Entitlements — HASi Control Plane" }, { property: "og:description", content: "Entitlements no painel administrativo HASi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: EntitlementsPage,
 });
 

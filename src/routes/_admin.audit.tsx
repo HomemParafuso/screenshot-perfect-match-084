@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { fmtDate } from "@/lib/format";
 
 export const Route = createFileRoute("/_admin/audit")({
-  head: () => ({ meta: [{ title: "Auditoria — HASi Control Plane" }] }),
+  head: () => ({ meta: [{ title: "Auditoria — HASi Control Plane" }, { name: "description", content: "Auditoria no painel administrativo HASi." }, { property: "og:title", content: "Auditoria — HASi Control Plane" }, { property: "og:description", content: "Auditoria no painel administrativo HASi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: AuditPage,
 });
 

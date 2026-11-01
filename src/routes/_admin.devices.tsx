@@ -9,7 +9,7 @@ import { errorMessage, post } from "@/lib/api";
 import { fmtDate } from "@/lib/format";
 
 export const Route = createFileRoute("/_admin/devices")({
-  head: () => ({ meta: [{ title: "Dispositivos — HASi Control Plane" }] }),
+  head: () => ({ meta: [{ title: "Dispositivos — HASi Control Plane" }, { name: "description", content: "Dispositivos no painel administrativo HASi." }, { property: "og:title", content: "Dispositivos — HASi Control Plane" }, { property: "og:description", content: "Dispositivos no painel administrativo HASi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: DevicesPage,
 });
 

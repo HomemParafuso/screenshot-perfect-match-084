@@ -7,7 +7,7 @@ import { AuthShell } from "@/components/hasi/AuthShell";
 import { errorMessage, forgotPassword } from "@/lib/api";
 
 export const Route = createFileRoute("/forgot-password")({
-  head: () => ({ meta: [{ title: "Recuperar senha — HASi Control Plane" }, { name: "description", content: "Recuperação de senha do HASi." }] }),
+  head: () => ({ meta: [{ title: "Recuperar senha — HASi Control Plane" }, { name: "description", content: "Recuperação de senha do HASi." }, { property: "og:title", content: "Recuperar senha — HASi Control Plane" }, { property: "og:description", content: "Recuperação de senha do HASi." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: ForgotPage,
 });
 
