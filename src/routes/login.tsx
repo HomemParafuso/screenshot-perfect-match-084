@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { AuthShell } from "@/components/hasi/AuthShell";
-import { errorMessage, login } from "@/lib/api";
+import { enterDemo, errorMessage, login } from "@/lib/api";
+import { Switch } from "@/components/ui/switch";
+import { DEMO_EMAIL } from "@/lib/demo-api";
 
 export const Route = createFileRoute("/login")({
   head: () => ({ meta: [{ title: "Entrar — HASi Control Plane" }, { name: "description", content: "Acesso ao painel administrativo do HASi." }] }),
@@ -17,6 +19,7 @@ function LoginPage() {
   const [password, setPassword] = useState("");
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [demo, setDemo] = useState(false);
   return (
     <AuthShell title="Entrar" subtitle="Acesso restrito ao painel administrativo.">
       <form
@@ -26,7 +29,8 @@ function LoginPage() {
           setBusy(true);
           setErr(null);
           try {
-            await login(email, password);
+            if (demo) await enterDemo(email, password);
+            else await login(email, password);
             navigate({ to: "/dashboard" });
           } catch (x) {
             setErr(errorMessage(x));
@@ -35,6 +39,11 @@ function LoginPage() {
           }
         }}
       >
+        <div className="flex items-center justify-between gap-3">
+          <Label htmlFor="demo-mode">Modo demonstração</Label>
+          <Switch id="demo-mode" checked={demo} onCheckedChange={(value) => { setDemo(value); setErr(null); if (value) setEmail(DEMO_EMAIL); }} />
+        </div>
+        {demo && <p className="text-xs text-muted-foreground">Dados fictícios · sem conexão com o servidor real</p>}
         <div className="space-y-1.5">
           <Label htmlFor="email">E-mail</Label>
           <Input id="email" type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />

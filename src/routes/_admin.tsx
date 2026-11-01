@@ -4,7 +4,7 @@ import {
   Activity, Bot, CreditCard, KeyRound, LayoutDashboard, ListChecks, LogOut, Puzzle, ScrollText, Smartphone, Tags, Users,
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { api, ApiError, hasSession, logout } from "@/lib/api";
+import { api, ApiError, hasDemoSession, hasSession, logout } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/_admin")({ component: AdminLayout });
@@ -88,6 +88,7 @@ function AdminLayout() {
         </div>
       </aside>
       <div className="min-w-0 flex-1">
+        {hasDemoSession() && <div className="border-b bg-secondary px-5 py-2 text-sm text-secondary-foreground">Demonstração · dados fictícios · alterações apenas nesta aba</div>}
         <header className="flex gap-2 overflow-x-auto border-b bg-sidebar px-3 py-2 md:hidden">
           {NAV.map((n) => (
             <Link key={n.to} to={n.to} className="whitespace-nowrap rounded px-2 py-1 text-xs" activeProps={{ className: "bg-sidebar-accent text-primary" }}>
