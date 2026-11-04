@@ -32,17 +32,17 @@ function seed(): DemoData {
   ];
   const plans = [{ id: "demo-plan", code: "demonstracao", name: "Plano exemplo", monthly_price_cents: 2900, currency: "BRL", is_active: true, created_at: now, entitlements: FEATURES.map((feature, i) => ({ feature, enabled: i < 4, limit: null })) }];
   const subscriptions = [
-    { id: "demo-sub-ana", user_id: "demo-ana", email: users[1].email, plan_id: "demo-plan", status: "active", current_period_start: now, current_period_end: end, created_at: now, updated_at: now },
-    { id: "demo-sub-bruno", user_id: "demo-bruno", email: users[2].email, plan_id: "demo-plan", status: "past_due", current_period_start: now, current_period_end: end, created_at: now, updated_at: now },
+    { id: "demo-sub-ana", user_id: "demo-ana", email: users[1]?.email, plan_id: "demo-plan", status: "active", current_period_start: now, current_period_end: end, created_at: now, updated_at: now },
+    { id: "demo-sub-bruno", user_id: "demo-bruno", email: users[2]?.email, plan_id: "demo-plan", status: "past_due", current_period_start: now, current_period_end: end, created_at: now, updated_at: now },
   ];
-  const owned = { user_id: "demo-ana", email: users[1].email, created_at: now, updated_at: now };
+  const owned = { user_id: "demo-ana", email: users[1]?.email, created_at: now, updated_at: now };
   return {
     users, plans, subscriptions,
     devices: [{ ...owned, id: "demo-device", name: "Pixel de exemplo", platform: "android", app_version: "1.0.0", last_seen_at: now, revoked_at: null }],
     keys: [{ ...owned, id: "demo-key", provider: "openai", label: "Chave fictícia", last4: "0000" }],
     skills: [{ ...owned, id: "demo-skill", name: "Revisão de código", description: "Exemplo", enabled: true }],
     agents: [{ ...owned, id: "demo-agent", name: "Assistente de exemplo", description: "Exemplo", enabled: true }],
-    events: [{ id: "demo-event", email: users[1].email, actor_email: DEMO_EMAIL, from_status: null, to_status: "active", note: "Registro fictício", created_at: now }],
+    events: [{ id: "demo-event", email: users[1]?.email, actor_email: DEMO_EMAIL, from_status: null, to_status: "active", note: "Registro fictício", created_at: now }],
     audit: [{ id: "demo-audit", action: "demo.started", details: { simulated: true }, ip: null, created_at: now, actor_email: DEMO_EMAIL, target_email: null, target_user_id: null }],
   };
 }
@@ -64,7 +64,7 @@ export async function demoRequest(path: string, init: RequestInit = {}): Promise
   const data = readData();
   const now = new Date().toISOString();
   const uid = () => crypto.randomUUID();
-  const planName = (id: string) => data.plans.find((x) => x['id'] === id)?.name ?? "—";
+  const planName = (id: string) => data.plans.find((x) => x['id'] === id)?.['name'] ?? "—";
   const filter = (rows: Row[]) => {
     const q = url.searchParams.get("q")?.toLowerCase();
     const status = url.searchParams.get("status");
@@ -95,7 +95,7 @@ export async function demoRequest(path: string, init: RequestInit = {}): Promise
       const subscriptions = subs().filter((x) => x['user_id'] === user['id']);
       const subscription = subscriptions.find((x) => x['status'] !== "canceled") ?? null;
       const plan = data.plans.find((x) => x['id'] === subscription?.['plan_id']);
-      const entitled = user['status'] === "active" && ["active", "trial"].includes(subscription?.['status'] ?? "") && !!plan?.is_active;
+      const entitled = user['status'] === "active" && ["active", "trial"].includes(subscription?.['status'] ?? "") && !!plan?.['is_active'];
       const features = Object.fromEntries(FEATURES.map((feature) => { const e = plan?.['entitlements'].find((x: Row) => x['feature'] === feature); return [feature, { enabled: entitled && !!e?.['enabled'], limit: entitled ? e?.['limit'] ?? null : null }]; }));
       const own = (rows: Row[]) => rows.filter((x) => x['user_id'] === user['id']);
       return { user, entitlements: { entitled, features, subscription }, subscriptions, devices: own(data.devices), provider_keys: own(data.keys), skills: own(data.skills), agents: own(data.agents), remote_sessions: [] };
