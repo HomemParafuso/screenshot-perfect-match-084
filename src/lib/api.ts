@@ -120,6 +120,7 @@ export const put = <T = any>(path: string, body: unknown) => api<T>(path, { meth
 export const patch = <T = any>(path: string, body: unknown) => api<T>(path, { method: "PATCH", body: JSON.stringify(body) });
 
 const ERRORS: Record<string, string> = {
+  api_url_missing: "Endereço da API não configurado. Ligue o modo demonstração ou informe o servidor em “Servidor da API”.",
   invalid_credentials: "E-mail ou senha incorretos.",
   account_suspended: "Esta conta está suspensa.",
   email_in_use: "Este e-mail já está cadastrado.",
