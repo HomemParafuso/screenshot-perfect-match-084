@@ -1,2 +1,2 @@
-- [ ] Add isolated demo login and fictitious admin data.
-- [ ] Verify login, editing, reload, and logout.
+- [x] Add isolated demo login and fictitious admin data.
+- [x] Verify login, editing, reload, and logout.
