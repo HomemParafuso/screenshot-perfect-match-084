@@ -43,7 +43,7 @@ function LoginPage() {
           <Label htmlFor="demo-mode">Modo demonstração</Label>
           <Switch id="demo-mode" checked={demo} onCheckedChange={(value) => { setDemo(value); setErr(null); if (value) setEmail(DEMO_EMAIL); }} />
         </div>
-        {demo && <p className="text-xs text-muted-foreground">Dados fictícios · sem conexão com o servidor real</p>}
+        {demo && <p className="text-xs text-muted-foreground">Dados fictícios · sem conexão com o servidor real · use {DEMO_EMAIL} / admin102030</p>}
         <div className="space-y-1.5">
           <Label htmlFor="email">E-mail</Label>
           <Input id="email" type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} />
