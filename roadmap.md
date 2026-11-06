@@ -1,3 +1,4 @@
 - [x] Add isolated demo login and fictitious admin data.
 - [x] Verify login, editing, reload, and logout.
 - [x] Show demo credentials on the login screen and explain the missing-API-address error.
+- [ ] Expand the demo selector click target and verify demo login.

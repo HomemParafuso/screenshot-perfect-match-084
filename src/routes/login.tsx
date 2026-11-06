@@ -39,9 +39,9 @@ function LoginPage() {
           }
         }}
       >
-        <div className="flex items-center justify-between gap-3">
-          <Label htmlFor="demo-mode">Modo demonstração</Label>
-          <Switch id="demo-mode" checked={demo} onCheckedChange={(value) => { setDemo(value); setErr(null); if (value) setEmail(DEMO_EMAIL); }} />
+        <div className="relative flex min-h-11 items-center justify-between gap-3">
+          <Label htmlFor="demo-mode" className="cursor-pointer">Modo demonstração</Label>
+          <Switch id="demo-mode" type="button" aria-label="Modo demonstração" className="h-6 w-10 before:absolute before:inset-0 before:content-['']" checked={demo} onCheckedChange={(value) => { setDemo(value); setErr(null); if (value) setEmail(DEMO_EMAIL); }} />
         </div>
         {demo && <p className="text-xs text-muted-foreground">Dados fictícios · sem conexão com o servidor real · use {DEMO_EMAIL} / admin102030</p>}
         <div className="space-y-1.5">
